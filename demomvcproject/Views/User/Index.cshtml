@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - demomvcproject</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+         /* Media queries for responsive design */
+        @@media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="my-4">Users</h2>
+        <!-- Button to trigger modal -->
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Add
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>John Doe</td>
+                        <td>john.doe@example.com</td>
+                        <td>
+                           @*  <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal" data-id="1" data-name="John Doe" data-email="john.doe@example.com">Details</button> *@
+                            <a href="/User/Edit/1" class="btn btn-warning btn-sm">Edit</a>
+                            <button class="btn btn-danger btn-sm" data-id="1">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jane Smith</td>
+                        <td>jane.smith@example.com</td>
+                        <td>
+                            @* <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal" data-id="2" data-name="Jane Smith" data-email="jane.smith@example.com">Details</button> *@
+                            <a href="/User/Edit/2" class="btn btn-warning btn-sm">Edit</a>
+                            <button class="btn btn-danger btn-sm" data-id="2">Delete</button>
+                        </td>
+                    </tr>
+                    <!-- Add more rows as needed -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">User Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>ID:</strong> <span id="modalUserId"></span></p>
+                    <p><strong>Name:</strong> <span id="modalUserName"></span></p>
+                    <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for adding user -->
+                    <form id="addUserForm" novalidate>
+                        <div class="form-group">
+                            <label for="userName">Name</label>
+                            <input type="text" class="form-control" id="userName" placeholder="Enter Name" required>
+                            <div class="invalid-feedback">
+                                Please provide a name.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Email</label>
+                            <input type="email" class="form-control" id="userEmail" placeholder="Enter Email" required>
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">        
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM fully loaded and parsed');
+
+            // Details Modal
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                console.log('Details modal is being shown');
+
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var userId = button.data('id');
+                var userName = button.data('name');
+                var userEmail = button.data('email');
+
+                // Log the values to the console
+                console.log('ID:', userId);
+                console.log('Name:', userName);
+                console.log('Email:', userEmail);
+
+                // Populate modal with user details
+                var modal = $(this);
+                modal.find('#modalUserId').text(userId);
+                modal.find('#modalUserName').text(userName);
+                modal.find('#modalUserEmail').text(userEmail);
+            });
+
+            // Add User Form Validation
+            var form = document.getElementById('addUserForm');
+            var saveButton = document.getElementById('saveChangesBtn');
+
+            function validateForm() {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }
+
+            saveButton.addEventListener('click', function (event) {
+                validateForm();
+                if (form.checkValidity() === true) {
+                    var userName = document.getElementById('userName').value;
+                    var userEmail = document.getElementById('userEmail').value;
+
+                    console.log('Name:', userName);
+                    console.log('Email:', userEmail);
+
+                    // Optional: Submit the form here
+                    // form.submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
